@@ -1,0 +1,17 @@
+<paginated-table
+  ng-if="rows.length"
+  rows="rows"
+  columns="formattedColumns"
+  per-page="perPage">
+
+  <div class="agg-table-controls">
+    <small>输出：</small>&nbsp;&nbsp;
+    <a class="small" ng-click="aggTable.exportAsCsv(false)">
+      原始数据 <i aria-hidden="true" class="fa fa-download"></i>
+    </a>&nbsp;&nbsp;&nbsp;
+    <a class="small" ng-click="aggTable.exportAsCsv(true)">
+      表格格式 <i aria-hidden="true" class="fa fa-download"></i>
+    </a>
+    <paginate-controls></paginate-controls>
+  </div>
+</paginated-table>

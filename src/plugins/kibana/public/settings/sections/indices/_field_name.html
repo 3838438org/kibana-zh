@@ -1,0 +1,8 @@
+<span>{{field.displayName}}</span>
+&nbsp;
+<span
+  ng-if="indexPattern.timeFieldName === field.name"
+  tooltip="这个字段表示事件发生的时间。"
+  class="label label-default">
+  <i aria-hidden="true" class="fa fa-clock-o"></i>
+</span>

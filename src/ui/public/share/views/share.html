@@ -1,0 +1,15 @@
+<form role="form" class="vis-share">
+  <div class="form-group" ng-if="allowEmbed">
+    <label>
+      嵌入这个{{objectType}}
+      <small>到您的HTML源代码，注意所有的客户端必须能够访问。</small>
+    </label>
+    <share-object-url share-as-embed="true"></share-object-url>
+  </div>
+  <div class="form-group">
+    <label>
+      分享链接
+    </label>
+    <share-object-url share-as-embed="false"></share-object-url>
+  </div>
+</form>

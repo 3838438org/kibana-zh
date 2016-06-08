@@ -1,0 +1,15 @@
+<div class="actions">
+  <a ng-href="{{ kbnUrl.getRouteHref(field, 'edit') }}" aria-label="Edit" class="btn btn-xs btn-default">
+    <span class="sr-only">编辑</span>
+    <i aria-hidden="true" class="fa fa-pencil"></i>
+  </a>
+
+  <button
+    ng-if="field.scripted"
+    confirm-click="remove(field)"
+    confirmation="你确定要删除'{{field.name}}'? 这是不可逆的!"
+    class="btn btn-xs btn-danger"
+    aria-label="Delete">
+    <i aria-hidden="true" class="fa fa-trash"></i>
+  </button>
+</div>

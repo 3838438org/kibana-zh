@@ -1,0 +1,32 @@
+<h4>
+  <i class="fa fa-question-circle text-info"></i> 脚本帮助
+</h4>
+
+<p>
+  默认情况下，Elasticsearch脚本使用一种很像JavaScript，但限于基本的算术运算，运算符和比较的<a target="_window" href="http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html#_lucene_expressions_scripts">Lucene表达式<i class="fa-link fa"></i></a>。我们会让你通过阅读<a target="_window" href="http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html#_lucene_expressions_scripts">Lucene表达式<i class="fa-link fa"></i></a>来使用以下格式访问文档中的值：
+</p>
+
+<p><code>doc['some_field'].value</code></p>
+
+<p>
+  使用Lucene表达式的一些限制：
+</p>
+<ul>
+  <li> 只能访问数字字段 </li>
+  <li> 存储字段不可用 </li>
+  <li> 如果一个字段是稀疏的（只有一些文件包含一个值），文件丢失的字段将有一个值为0 </li>
+</ul>
+
+<p>
+  以下是所有能够用在脚本里面的操作符：
+</p>
+<ul>
+  <li> 算术运算符： + - * / % </li>
+  <li> 按位运算符： | & ^ ~ << >> >>> </li>
+  <li> 布尔运算符（包括三元运算符）： && || ! ?: </li>
+  <li> 比较运算符： < <= == >= > </li>
+  <li> 常见的数学函数： abs ceil exp floor ln log10 logn max min sqrt pow </li>
+  <li> 三角函数库函数： acosh acos asinh asin atanh atan atan2 cosh cos sinh sin tanh tan </li>
+  <li> 距离函数： haversin </li>
+  <li> 其他功能： min, max </li>
+</ul>

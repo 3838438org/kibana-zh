@@ -1,0 +1,38 @@
+<div class="form-group">
+  <label for="field">
+    字段
+  </label>
+
+  <span class="pull-right text-warning hintbox-label" ng-show="agg.params.field.analyzed"
+      ng-click="showAnalyzedFieldWarning = !showAnalyzedFieldWarning">
+    <i class="fa fa-warning"></i>分析字段
+  </span>
+  <div class="hintbox" ng-show="showAnalyzedFieldWarning && agg.params.field.analyzed">
+    <p>
+    <strong>注意!</strong>选定的字段包含分析字符串。分析字符串都是高度独立并且需要许多内存来进行可视化。例如<i>foo-bar</i>会分散成<i>foo</i>和<i>bar</i>。查看<a href="http://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html" target="_blank">映射类型</a>获取更多设置<i>not_analyzed</i>字段的信息。
+    </p>
+
+    <p ng-show="indexedFields.byName[agg.params.field.name + '.raw'].analyzed == false">
+      <strong>提示：</strong> <i>{{agg.params.field.name + '.raw'}}</i>可能是这个字段的<i>not_analyzed</i>版。
+    </p>
+  </div>
+
+  <select
+    class="form-control"
+    name="field"
+    required
+    ng-model="agg.params.field"
+    ng-show="indexedFields.length"
+    auto-select-if-only-one="indexedFields"
+    ng-options="field as field.displayName group by field.type for field in indexedFields"
+    ng-change="aggParam.onChange(agg)">
+  </select>
+
+  <div class="hintbox" ng-if="!indexedFields.length">
+    <p>
+      <i class="fa fa-danger text-danger"></i>
+      <strong>不兼容领域：</strong>"{{ vis.indexPattern.id }}"索引模式不包含下列字段类型中的任何一种：{{ agg.type.params.byName.field.filterFieldTypes | commaList:false }}
+    </p>
+  </div>
+
+</div>

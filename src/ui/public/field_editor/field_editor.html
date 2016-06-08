@@ -1,0 +1,126 @@
+<form ng-submit="editor.save()" name="form">
+  <div ng-if="editor.creating" class="form-group">
+    <label>名称</label>
+    <input
+      ng-model="editor.field.name"
+      required
+      placeholder="新脚本字段"
+      input-focus
+      class="form-control">
+  </div>
+  <div ng-if="editor.creating && editor.indexPattern.fields.byName[editor.field.name]" class="hintbox">
+    <p>
+      <i class="fa fa-danger text-danger"></i>
+      <strong>映射冲突：</strong>
+      你已经有了一个以{{ editor.field.name }}命名的字段。具有相同的字段名意味着你无法同时搜索这两个字段。
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label>类型</label>
+    <input
+      ng-model="editor.field.type"
+      readonly
+      class="form-control">
+  </div>
+
+  <div class="form-group">
+    <span class="pull-right text-warning hintbox-label" ng-click="editor.showFormatHelp = !editor.showFormatHelp">
+      <i class="fa fa-warning"></i> 警告
+    </span>
+
+    <label>格式 <small>（默认：<i>{{editor.defFormatType.resolvedTitle}}</i>）</small></label>
+
+    <div class="hintbox" ng-if="editor.showFormatHelp">
+      <h4 class="hintbox-heading">
+        <i class="fa fa-warning text-warning"></i> 警告
+      </h4>
+
+      <p>
+        格式化允许你控制显示具体值的方式。它能导致值被完全改变以及阻止高亮在搜索中起作用。
+      </p>
+    </div>
+
+    <select
+      ng-model="editor.selectedFormatId"
+      ng-options="format.id as format.title for format in editor.fieldFormatTypes"
+      class="form-control">
+    </select>
+    <fieldset
+      field-format-editor
+      ng-if="editor.selectedFormatId"
+      field="editor.field"
+      format-params="editor.formatParams">
+    </fieldset>
+  </div>
+
+  <div class="form-group">
+    <label for="editor.field.count">热度</label>
+    <div class="input-group">
+
+      <input
+        ng-model="editor.field.count"
+        type="number"
+        class="form-control">
+
+      <span class="input-group-btn">
+        <button
+          type="button"
+          ng-click="editor.field.count = editor.field.count + 1"
+          aria-label="Plus"
+          class="btn btn-default">
+          <i aria-hidden="true" class="fa fa-plus"></i>
+        </button>
+        <button
+          type="button"
+          ng-click="editor.field.count = editor.field.count - 1"
+          aria-label="Minus"
+          class="btn btn-default">
+          <i aria-hidden="true" class="fa fa-minus"></i>
+        </button>
+      </span>
+    </div>
+  </div>
+
+  <div ng-if="editor.field.scripted">
+    <div class="form-group">
+      <label>脚本</label>
+      <textarea required class="form-control text-monospace" ng-model="editor.field.script"></textarea>
+    </div>
+
+    <div class="form-group">
+      <div ng-bind-html="editor.scriptingWarning" class="hintbox"></div>
+    </div>
+
+    <div class="form-group">
+      <div ng-bind-html="editor.scriptingInfo" class="hintbox"></div>
+    </div>
+
+  </div>
+
+  <div class="form-group">
+    <button
+      type="button"
+      ng-click="editor.cancel()"
+      aria-label="Cancel"
+      class="btn btn-primary">
+      取消
+    </button>
+    <button
+      type="button"
+      ng-if="editor.field.scripted && !editor.creating"
+      confirm-click="editor.delete()"
+      confirmation="你确定要删除“{{ editor.field.name }}”? 这是不可逆的!"
+      aria-label="Delete"
+      class="btn btn-danger">
+      删除字段
+    </button>
+    <button
+      ng-disabled="form.$invalid"
+      type="submit"
+      aria-label="{{ editor.creating ? 'Create' : 'Update' }} Field"
+      class="btn btn-success">
+      {{ editor.creating ? '创建' : '更新' }}字段
+    </button>
+  </div>
+</form>

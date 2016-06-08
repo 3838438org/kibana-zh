@@ -1,0 +1,220 @@
+<div ng-controller="discover" class="app-container">
+  <navbar>
+    <form role="form" class="fill inline-form" ng-submit="fetch()" name="discoverSearch">
+      <div class="typeahead" kbn-typeahead="discover">
+        <div class="input-group"
+          ng-class="discoverSearch.$invalid ? 'has-error' : ''">
+          <input
+            parse-query
+            input-focus
+            kbn-typeahead-input
+            ng-model="state.query"
+            placeholder="Search..."
+            aria-label="Search input"
+            type="text"
+            class="form-control">
+          <button type="submit"
+            ng-disabled="discoverSearch.$invalid"
+            aria-label="Search">
+            <span aria-hidden="true" class="fa fa-search"></span></button>
+        </div>
+        <kbn-typeahead-items></kbn-typeahead-items>
+      </div>
+    </form>
+
+    <div class="button-group" role="toolbar">
+      <kbn-tooltip text="新建搜索" placement="bottom" append-to-body="1">
+        <button
+          ng-click="newQuery()"
+          aria-label="New Search">
+          <i aria-hidden="true" class="fa fa-file-new-o"></i>
+        </button>
+      </kbn-tooltip>
+      <kbn-tooltip text="保存搜索数据" placement="bottom" append-to-body="1">
+        <button
+          ng-click="configTemplate.toggle('save');"
+          ng-class="{active: configTemplate.is('save')}"
+          aria-haspopup="true"
+          aria-expanded="{{ configTemplate.is('save') }}"
+          aria-label="Save Search">
+          <i aria-hidden="true" class="fa fa-save"></i>
+        </button>
+      </kbn-tooltip>
+      <kbn-tooltip text="打开已保存数据" placement="bottom" append-to-body="1">
+        <button
+          aria-haspopup="true"
+          aria-expanded="{{ configTemplate.is('load') }}"
+          ng-click="configTemplate.toggle('load');"
+          ng-class="{active: configTemplate.is('load')}"
+          aria-label="Load Saved Search">
+          <i aria-hidden="true" class="fa fa-folder-open-o"></i>
+        </button>
+      </kbn-tooltip>
+      <kbn-tooltip text="分享" placement="bottom" append-to-body="1">
+        <button
+          aria-label="Share Search"
+          aria-haspopup="true"
+          aria-expanded="{{ configTemplate.is('share') }}"
+          ng-class="{active: configTemplate.is('share')}"
+          ng-click="configTemplate.toggle('share');">
+          <i aria-hidden="true" class="fa fa-external-link"></i>
+        </button>
+      </kbn-tooltip>
+    </div>
+  </navbar>
+
+  <config config-template="configTemplate" config-object="opts" config-close="configClose"></config>
+
+  <div class="container-fluid" role="main">
+    <div class="row">
+      <filter-bar state="state"></filter-bar>
+    </div>
+    <div class="row">
+      <div class="col-md-2 sidebar-container collapsible-sidebar">
+        <disc-field-chooser
+          columns="state.columns"
+          refresh="refreshFieldList"
+          hits="rows"
+          field-counts="fieldCounts"
+          filter="filterQuery"
+          index-pattern="searchSource.get('index')"
+          index-pattern-list="opts.indexPatternList"
+          state="state">
+        </disc-field-chooser>
+      </div>
+
+      <div class="discover-wrapper col-md-10">
+
+        <div class="discover-info">
+          <span ng-show="opts.savedSearch.id" class="discover-info-title">
+            <span ng-bind="::opts.savedSearch.title"></span>
+            <i aria-label="Reload Saved Search" tooltip="Reload Saved Search" ng-click="resetQuery();" class="fa fa-undo small"></i>
+          </span>
+
+          <strong class="discover-info-hits">{{(hits || 0) | number:0}}</strong>
+          <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
+        </div>
+
+        <div class="discover-content">
+          <!-- no results -->
+          <div ng-show="resultState === 'none'">
+              <div class="col-md-10 col-md-offset-1">
+
+                <h1>没有找到结果<i aria-hidden="true" class="fa fa-meh-o"></i></h1>
+
+                <p>
+                  很抱歉，没有找到任何匹配的搜索结果。解决办法：
+                </p>
+
+                <div class="shard-failures" ng-show="failures">
+                  <h3>碎片故障</h3>
+                  <p>发生的碎片故障：</p>
+                  <ul>
+                    <li ng-repeat="failure in failures | limitTo: failuresShown"><strong>索引：</strong> {{failure.index}} <strong>碎片：</strong> {{failure.shard}} <strong>原因：</strong> {{failure.reason}} </li>
+                  </ul>
+                  <a ng-click="showAllFailures()" ng-if="failures.length > failuresShown" title="Show More">更多</a>
+                  <a ng-click="showLessFailures()" ng-if="failures.length === failuresShown && failures.length > 5" title="Show Less">隐藏</a>
+                </div>
+
+                <div ng-show="opts.timefield">
+                  <p>
+                    <h3>扩大时间范围</h3>
+                    <p>你所搜索的一个数据域的索引，可能你的语句在当前时间范围内未匹配到数据，可能在当前选择的时间范围内没有数据。点击下面的按钮打开时间选择器。你可以点开屏幕右上角的<a class="btn btn-xs navbtn" ng-click="toggleTimepicker(); toggledTimepicker = !toggledTimepicker" aria-expanded="{{toggledTimepicker}}" aria-label="time picker">时间选择器<i aria-hidden="true" class="fa fa-clock-o"></i></a>作为未来的参照。
+                  </p>
+                </div>
+
+                <h3>再次搜索</h3>
+                <p>
+                  在顶部的搜索栏支持Lucene<a href="http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax" target="_blank">查询字符串语法</a>。请参考下列语法进行进一步搜索。
+                </p>
+
+                <p>
+                  <h4>示例：</h4>
+                  在所有域中搜索包含数字200的记录：
+                  <pre>200</pre>
+
+                  或者我们也可以指定一个特定的域，在status域中搜索数字200：
+                  <pre>status:200</pre>
+
+                  在status域中搜索400-499之间的数字：
+                  <pre>status:[400 TO 499]</pre>
+
+                  在status域中搜索400-499之间并且用PHP声明的数字：
+                  <pre>status:[400 TO 499] AND extension:PHP</pre>
+
+                  或者HTML
+                  <pre>status:[400 TO 499] AND (extension:php OR extension:html)</pre>
+                </p>
+
+              </div>
+          </div>
+
+          <!-- loading -->
+          <div ng-show="resultState === 'loading'">
+            <div class="discover-overlay">
+              <h2>搜索</h2>
+              <div class="spinner large"></div>
+              <div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
+            </div>
+          </div>
+
+          <!-- result -->
+          <div class="results" ng-show="resultState === 'ready'">
+            <div class="discover-timechart" ng-if="opts.timefield">
+              <header>
+                <center class="small">
+                  <span tooltip="To change the time, click the clock icon in the navigation bar">{{timeRange.from | moment}} - {{timeRange.to | moment}}</span>
+
+                  &mdash;
+
+                  <span class="results-interval" ng-hide="showInterval">
+                    <a
+                      ng-click="toggleInterval()">
+                      {{ intervalName }}
+                    </a>
+                  </span>
+
+                  <span ng-show="showInterval" class="results-interval form-inline">
+                    <select
+                      class="form-control"
+                      ng-model="state.interval"
+                      ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
+                      >
+                    </select>
+                  </span>
+                </center>
+
+              </header>
+
+              <visualize
+                ng-if="vis && rows.length != 0"
+                vis="vis"
+                es-resp="mergedEsResp"
+                ui-state="uiState"
+                search-source="searchSource">
+              </visualize>
+            </div>
+
+            <div class="discover-table" fixed-scroll>
+              <doc-table
+                hits="rows"
+                index-pattern="indexPattern"
+                sorting="state.sort"
+                columns="state.columns"
+                infinite-scroll="true"
+                filter="filterQuery">
+              </doc-table>
+
+              <div ng-if="rows.length == opts.sampleSize" class="discover-table-footer">
+                <center>
+                  这是第一个匹配你搜索的{{opts.sampleSize}}文件，完善你的搜索以查看更多。
+                  <a ng-click="toTop()" title="Back to top">回到顶部</a>
+                </center>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

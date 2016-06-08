@@ -1,0 +1,49 @@
+<div>
+  <div class="vis-option-item" ng-show="vis.hasSchemaAgg('segment', 'date_histogram')">
+    <label>
+      <input type="checkbox" ng-model="vis.params.addTimeMarker" ng-checked="vis.params.addTimeMarker">
+      当前时间标记
+    </label>
+  </div>
+  <div class="vis-option-item">
+    <label>
+      <input type="checkbox" ng-model="vis.params.setYExtents">
+      设置Y轴范围
+    </label>
+    <div ng-if="vis.params.setYExtents">
+      <label>
+        最大y值
+        <input name="yMax"
+               class="form-control"
+               type="number"
+               step="0.1"
+               greater-than="{{vis.params.yAxis.min}}"
+               ng-model="vis.params.yAxis.max"
+               ng-required="vis.params.setYExtents">
+      </label>
+      <div ng-show="vis.params.yAxis.min >= vis.params.yAxis.max">
+        <span class="text-danger">最大值必须大于最小值</span>
+      </div>
+      <label>
+        最小y值
+        <input name="yMin"
+               class="form-control"
+               type="number"
+               step="0.1"
+               less-than="{{vis.params.yAxis.max}}"
+               greater-than="{{vis.params.scale === 'log' ? 0 : ''}}"
+               ng-model="vis.params.yAxis.min"
+               ng-required="vis.params.setYExtents">
+      </label>
+    </div>
+    <div ng-show="vis.params.setYExtents && vis.params.scale === 'log' && vis.params.yAxis.min <= 0">
+      <span class="text-danger">选择时最小值必须大于0</span>
+    </div>
+    <div class="vis-option-item">
+      <label>
+        <input type="checkbox" ng-model="vis.params.defaultYExtents" ng-disabled="vis.params.setYExtents">
+        Y轴数据规模边界
+      </label>
+    </div>
+  </div>
+</div>

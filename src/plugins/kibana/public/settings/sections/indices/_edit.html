@@ -1,0 +1,50 @@
+<kbn-settings-app section="indices">
+  <kbn-settings-indices>
+    <div ng-controller="settingsIndicesEdit">
+      <div class="page-header">
+        <kbn-settings-index-header
+          index-pattern="indexPattern"
+          set-default="setDefaultPattern()"
+          refresh-fields="indexPattern.refreshFields()"
+          delete="removePattern()">
+        </kbn-settings-index-header>
+
+        <p>
+          该页列出在<strong>{{::indexPattern.id}}</strong>索引的每个域以及被后台记录与核心类型相关的域。而这个列表允许你查看每个字段的核心类型，改变字段类型必须使用Elasticsearch的
+          <a target="_window" href="http://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html">
+            Mapping API
+            <i aria-hidden="true" class="fa-link fa"></i>
+          </a>
+        </p>
+        <div ng-if="indexPattern.timeFieldName && indexPattern.intervalName" class="alert alert-info">
+          这个索引采用<strong>基于时间的索引</strong>重复<span ng-bind="::indexPattern.getInterval().display"></span>
+        </div>
+        <div ng-if="!indexPattern.canExpandIndices()" class="alert alert-info">
+          该索引类型将被直接查询而不会被扩展到搜索更多别的索引。
+        </div>
+        <div ng-if="conflictFields.length" class="alert alert-warning">
+          <strong>映射冲突！</strong>字段被定义为匹配这个模式的若干类型（字符串、整型等），你仍然可以在kibana中使用这些冲突字段，但是它们将在需要明确知道它们类型的地方不可用。纠正该问题需要重新检索数据。
+        </div>
+      </div>
+
+      <form role="form">
+        <input aria-label="Filter" ng-model="fieldFilter" class="form-control span12" type="text" placeholder="Filter" />
+      </form>
+
+      <br />
+
+      <ul class="nav nav-tabs">
+        <li class="kbn-settings-tab" ng-class="{ active: state.tab === fieldType.index }" ng-repeat="fieldType in fieldTypes">
+          <a ng-click="changeTab(fieldType)">
+            {{ fieldType.title }}
+            <small>({{ fieldType.count }})</small>
+          </a>
+        </li>
+      </ul>
+
+      <indexed-fields ng-show="state.tab == 'indexedFields'" class="fields indexed-fields"></indexed-fields>
+      <scripted-fields ng-show="state.tab == 'scriptedFields'" class="fields scripted-fields"></scripted-fields>
+
+    </div>
+  </kbn-settings-indices>
+</kbn-settings-app>

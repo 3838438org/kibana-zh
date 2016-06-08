@@ -1,0 +1,20 @@
+<h3>脚本字段</h3>
+<p>这些脚本字段会动态计算您的数据。他们可以用于可视化并显示在你的文件,但是他们不能搜索。你可以在这里管理它们,并添加新的你认为合适的脚本,但是要小心,脚本可以很棘手!<!-- If you need some examples, why not let Kibana <a ng-click="addDateScripts()"><strong>create a few examples from your date fields.</strong></a --></p>
+
+<header>
+  <a
+    ng-href="{{ kbnUrl.getRouteHref(indexPattern, 'addField') }}"
+    class="btn btn-info"
+    aria-label="Add Scripted Field">
+    <i aria-hidden="true" class="fa fa-plus"></i>
+    添加脚本字段
+  </a>
+</header>
+
+<paginated-table
+  columns="columns"
+  rows="rows"
+  per-page="perPage">
+</paginated-table>
+
+<p class="text-center" ng-if="rows.length === 0">没有匹配的脚本字段</p>

@@ -1,0 +1,165 @@
+<kbn-settings-app section="indices">
+  <kbn-settings-indices>
+    <div ng-controller="settingsIndicesCreate" class="kbn-settings-indices-create">
+      <div class="page-header">
+        <h1>配置索引</h1>
+        为了使用kibana你必须配置至少一个数据索引。该索引用来识别后台索引以便启动搜索和分析。它们也可用于设置字段。
+      </div>
+      <div>
+        <form name="form" role="form" class="well" ng-submit="createIndexPattern()">
+          <div class="form-group time-and-pattern">
+            <label>
+              <input
+                ng-model="index.isTimeBased"
+                type="checkbox">
+              索引包含基于时间的事件
+            </label>
+            <br>
+            <label ng-if="index.isTimeBased">
+              <input ng-model="index.nameIsPattern" type="checkbox">
+              使用事件时间来创建索引名称 <small>【不推荐】</small>
+            </label>
+          </div>
+
+          <div class="form-group" ng-if="index.isTimeBased && index.nameIsPattern">
+            <div class="alert alert-warning">
+              <h4>时间间隔的索引已过时！</h4>
+              <p>
+                我们<strong>强烈建议</strong>使用通配符模式的名称而不是索引的时间间隔。
+              </p>
+              <p>
+                kibana现在足够聪明可以对当前时间范围内自动确定哪些通配符索引自动匹配搜索。这意味着通配符搜索模式以时间间隔模式在时间范围内进行搜索时现在能得到相同的性能指标优化。
+              </p>
+            </div>
+            <label>
+              索引间隔&nbsp;
+              <kbn-info info="索引名刷新时间间隔"></kbn-info>
+            </label>
+            <select
+              required
+              ng-options="opt.display for opt in index.nameIntervalOptions"
+              ng-model="index.nameInterval"
+              class="form-control">
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>
+              索引名称或模式
+            </label>
+            <p class="help-block" ng-if="!index.nameIsPattern">模式允许使用动态名称*作为通配符。例如：logstash-*</p>
+            <p class="help-block" ng-if="index.isTimeBased && index.nameIsPattern">允许定义动态索引名称。用括号表示索引名称中的静态文本。例如：[logstash-]YYYY.MM.DD.请注意，周设置使用ISO周，从星期一开始。&mdash;
+              <small><a target="_blank" href="http://momentjs.com/docs/#/displaying/format/">日期格式文件</a></small></p>
+            <input
+              ng-model="index.name"
+              ng-attr-placeholder="{{index.defaultName}}"
+              ng-model-options="{ updateOn: 'default blur', debounce: {'default': 2500, 'blur': 0} }"
+              validate-index-name
+              name="name"
+              required
+              type="text"
+              class="form-control">
+              <small ng-show="index.nameInterval.name == 'weeks'">
+                <strong>注：</strong>
+                kibana需要在你的索引创建时使用ISO Week Date
+                查看<a href="https://en.wikipedia.org/wiki/ISO_week_date" target="_blank" title="Wikipedia: ISO Week Date">维基百科： ISO Week Date</a>
+              </small>
+            </div>
+
+          <div class="form-group" ng-if="canExpandIndices()">
+            <label>
+              <input ng-model="index.notExpandable" type="checkbox">
+              不要在搜索时扩展索引<small>（不推荐）</small>
+            </label>
+
+            <div ng-if="index.notExpandable" class="alert alert-info">
+              该索引类型将被直接查询而不会被扩展到搜索更多别的索引。
+
+              Elasticsearch服务器将接受一个包含<em>{{index.name}}</em>的查询语句并搜索无论是否在当前时间范围内的所有匹配该索引的数据。
+            </div>
+
+            <p class="help-block">
+              默认情况下，在任何基于时间的索引，都会自动扩展搜索包含一个只包含当前选定时间范围内的索引数据的通配符。
+            </p>
+
+            <p class="help-block">
+              搜索和索引 <em>logstash-*</em>会查询后台的落在当前时间范围内的具体匹配指标（如<em>logstash-2015.12.21</em>）。
+            </p>
+          </div>
+
+          <section>
+            <div class="alert alert-danger" ng-repeat="err in index.patternErrors">
+              {{err}}
+            </div>
+
+            <div class="alert alert-info" ng-if="index.samples">
+             尝试匹配以下指标和别名：
+              <ul>
+                <li ng-repeat="sample in index.samples">{{sample}}</li>
+              </ul>
+              <button type="button" ng-click="moreSamples(true)" class="btn btn-default">
+                扩大搜索
+              </button>
+            </div>
+
+            <div class="alert alert-{{index.existing.class}}" ng-if="index.existing">
+              匹配{{index.existing.matchPercent}}存在该索引和别名
+              <ul>
+                <li ng-repeat="match in index.existing.matches | orderBy:'toString()'| limitTo: index.sampleCount">{{match}}</li>
+              </ul>
+              <button
+                ng-if="index.sampleCount < index.existing.matches.length"
+                ng-click="moreSamples()"
+                type="button"
+                class="btn btn-default">
+                扩大搜索
+              </button>
+            </div>
+
+            <div class="alert alert-info" ng-if="index.existing.failures.length">
+              索引和别名已存在，但是没有匹配到类型：
+              <ul>
+                <li ng-repeat="match in index.existing.failures | limitTo: index.sampleCount">{{match}}</li>
+              </ul>
+              <a
+                ng-if="index.sampleCount < index.existing.matches.length"
+                ng-click="moreSamples()"
+                class="alert-link">
+                更多
+              </a>
+            </div>
+          </section>
+
+          <div class="form-group" ng-if="index.isTimeBased && !index.fetchFieldsError">
+            <label>
+              时间字段名称
+              &nbsp;
+              <kbn-info info="该域将被用于全局时间过滤的过滤事件"></kbn-info>
+              &nbsp;
+              <small>
+                <a ng-click="refreshFieldList();"> 更新字段</a>
+              </small>
+            </label>
+            <select
+              required
+              ng-if="!index.fetchFieldsError"
+              ng-options="field.name for field in index.dateFields"
+              ng-model="index.timeField"
+              auto-select-if-only-one="index.dateFields"
+              class="form-control">
+            </select>
+          </div>
+
+          <button
+            ng-disabled="form.$invalid || index.fetchFieldsError"
+            ng-class="index.fetchFieldsError ? 'btn-default' : 'btn-success'"
+            type="submit"
+            class="btn">
+            <span ng-hide="form.name.$error.indexNameInput">{{index.fetchFieldsError || "Create" }}</span>
+            <span ng-show="form.name.$error.indexNameInput"> 无效索引名称模式</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </kbn-settings-indices>
+</kbn-settings-app>

@@ -1,0 +1,38 @@
+<div class="col-md-2 sidebar-container">
+  <div class="sidebar-list">
+    <div class="sidebar-list-header">
+      <h5>
+        索引&nbsp;
+        <a
+          ng-if="edittingId"
+          href="#/settings/indices"
+          class="btn btn-primary btn-xs"
+          aria-label="Add New">
+          <span class="sr-only">添加</span>
+          <i aria-hidden="true" class="fa fa-plus"></i> 添加
+        </a>
+      </h5>
+    </div>
+    <ul class="list-unstyled">
+      <li
+        ng-if="!defaultIndex"
+        class="sidebar-item">
+        <div class="sidebar-item-title full-title">
+            <span class="label label-warning">警告</span> 没有默认索引，你必须选择或创建一个。
+        </div>
+      </li>
+      <li
+        ng-repeat="pattern in indexPatternList | orderBy:['-default','id'] track by pattern.id "
+        class="sidebar-item">
+        <a href="{{::pattern.url}}">
+          <div class="{{::pattern.class}}">
+            <i aria-hidden="true" ng-if="pattern.default" class="fa fa-star"></i>
+            <span ng-bind="::pattern.id"></span>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="col-md-10" ng-transclude></div>

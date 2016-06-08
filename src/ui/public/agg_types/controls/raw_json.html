@@ -1,0 +1,19 @@
+<div class="form-group regex">
+    <span class="hintbox-label" ng-click="showJsonHint = !showJsonHint">
+      <label>输入JSON</label>
+      <i class="fa fa-info-circle"></i>
+    </span>
+  <div class="hintbox" ng-show="showJsonHint">
+    <p>
+      您在此处添加任何JSON格式特性将与本节的Elasticsearch聚集定义合并。例如<i>shard_size</i>在一个<i>terms</i>上的聚集。
+    </p>
+  </div>
+  <p>
+    <textarea
+      type="text"
+      class="form-control"
+      ng-model="agg.params.json"
+      validate-json
+      ></textarea>
+  </p>
+</div>

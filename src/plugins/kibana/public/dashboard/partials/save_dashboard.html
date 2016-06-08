@@ -1,0 +1,14 @@
+<form ng-submit="opts.save()" role="form">
+  <div class="form-group">
+    <label for="dashboardTitle">保存为</label>
+    <input id="dashboardTitle" type="text" ng-model="opts.dashboard.title" class="form-control" placeholder="Dashboard title" input-focus="select">
+  </div>
+  <div class="form-group">
+    <label>
+      <input type="checkbox" ng-model="opts.dashboard.timeRestore" ng-checked="opts.dashboard.timeRestore">
+      用应用存储时间
+      <kbn-info info="每次该应用加载时将时间筛选器更改为当前选定的时间"></kbn-info>
+    </label>
+  </div>
+  <button type="submit" ng-disabled="!opts.dashboard.title" class="btn btn-primary" aria-label="Save dashboard">保存</button>
+</form>

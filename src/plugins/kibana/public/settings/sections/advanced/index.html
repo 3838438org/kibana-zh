@@ -1,0 +1,28 @@
+<kbn-settings-app section="advanced">
+  <kbn-settings-advanced class="container">
+    <div class="bs-callout bs-callout-warning">
+      <h4>警告：你可能在这里造成破坏</h4>
+      请注意，这里的设置都只针对高级用户。你在这里的
+      调整可能会破坏大部分功能的使用。一些设置可能是
+      没有证书、不支持的或者还是实验的。如果一个字段
+      具有一个默认值，重置该字段的默认值可能会导致它
+      不能接受的其他配置指令。删除自定义设置将永久删
+      除它在kibana的配置。
+    </div>
+    <form role="form">
+      <input aria-label="Filter" ng-model="advancedFilter" class="form-control span12" type="text" placeholder="Filter"/>
+    </form>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>名称</th>
+          <th>值</th>
+          <th>操作 <kbn-info info="编辑或恢复默认值"></kbn-info></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="conf in configs | filter:advancedFilter" advanced-row="conf" configs="configs"></tr>
+      </tbody>
+    </table>
+  </kbn-settings-advanced>
+</kbn-settings-app>

@@ -1,0 +1,76 @@
+<kbn-settings-app section="objects">
+  <kbn-settings-objects class="container">
+    <div class="header">
+      <h2 class="title">编辑保存的对象</h2>
+      <button class="btn btn-default controls" ng-click="exportAll()"><i aria-hidden="true" class="fa fa-download"></i> 导出所有</button>
+      <button file-upload="importAll(fileContents)" class="btn btn-default controls" ng-click><i aria-hidden="true" class="fa fa-upload"></i> 上传</button>
+    </div>
+    <p>
+      在这里你可以删除保存的对象，诸如保存的搜索。你也可以编辑保存对象的原始数据。一般的对象仅仅通过其关联的应用进行修改，该应用可能更新本页面的内容。每个标签限制100个结果。你可以使用条件搜索不在默认列表中的对象。
+    </p>
+    <form role="form">
+      <input aria-label="Filter" ng-model="advancedFilter" class="form-control span12" type="text" placeholder="Filter"/>
+    </form>
+
+    <ul class="nav nav-tabs">
+      <li class="kbn-settings-tab" ng-class="{ active: state.tab === service.title }" ng-repeat="service in services">
+        <a title="{{ service.title }}" ng-click="changeTab(service)">{{ service.title }}
+          <small>
+          ({{service.data.length}}<span ng-show="service.total > service.data.length"> of {{service.total}}</span>)
+          </small>
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="action-bar">
+        <label>
+          <input type="checkbox" ng-checked="currentTab.data.length > 0 && selectedItems.length == currentTab.data.length" ng-click="toggleAll()" />
+          全选
+        </label>
+        <a ng-disabled="selectedItems.length == 0"
+          confirm-click="bulkDelete()"
+          confirmation="你确定要删除选择的{{currentTab.title}}? 这是不可逆的!"
+          class="btn btn-xs btn-danger" aria-label="Delete"><i aria-hidden="true" class="fa fa-trash"></i> 删除</a>
+        <a ng-disabled="selectedItems.length == 0"
+          ng-click="bulkExport()"
+          class="btn btn-xs btn-default" aria-label="Export"><i aria-hidden="true" class="fa fa-download"></i> 导出</a>
+      </div>
+      <div ng-repeat="service in services" ng-class="{ active: state.tab === service.title }" class="tab-pane">
+        <ul class="list-unstyled">
+          <li class="item" ng-repeat="item in service.data | orderBy:'title'">
+            <div class="actions pull-right">
+              <button
+                ng-click="edit(service, item)"
+                class="btn btn-default"
+                aria-label="Edit">
+                <span class="sr-only">编辑</span>
+                <i aria-hidden="true" class="fa fa-pencil"></i>
+              </button>
+
+              <button
+                ng-click="open(item)"
+                class="btn btn-info"
+                aria-label="Hide">
+                <span class="sr-only">Hide</span>
+                <i aria-hidden="true" class="fa fa-eye"></i>
+              </button>
+            </div>
+
+            <div class="pull-left">
+              <input
+                ng-click="toggleItem(item)"
+                ng-checked="selectedItems.indexOf(item) >= 0"
+                type="checkbox" >
+            </div>
+
+            <div class="item-title">
+              <a ng-click="edit(service, item)">{{ item.title }}</a>
+            </div>
+          </li>
+          <li ng-if="!service.data.length" class="empty">没有找到“{{service.title}}”</li>
+        </ul>
+      </div>
+    </div>
+
+  </kbn-settings-objects>
+</kbn-settings-app>

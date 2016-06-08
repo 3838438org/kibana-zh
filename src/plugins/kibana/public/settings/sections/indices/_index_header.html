@@ -1,0 +1,35 @@
+<div class="index-pattern-name">
+  <h1 class="title" css-truncate>
+    <i aria-hidden="true" ng-if="defaultIndex === indexPattern.id" class="fa fa-star"></i>
+    {{indexPattern.id}}
+  </h1>
+  <div class="controls">
+    <button
+      ng-if="setDefault"
+      ng-click="setDefault()"
+      tooltip="设置为默认索引"
+      class="btn btn-success">
+      <span class="sr-only">设置为默认索引</span>
+      <i aria-hidden="true" class="fa fa-star"></i>
+    </button>
+    <button
+      ng-if="refreshFields"
+      confirm-click="refreshFields()"
+      confirmation="常用字段将被重置，你确认要重载你的字段吗?"
+      tooltip="刷新字段列表"
+      class="btn btn-warning">
+      <span class="sr-only">重载字段列表</span>
+      <i aria-hidden="true" class="fa fa-refresh"></i>
+    </button>
+    <button
+      ng-if="delete"
+      confirm-click="delete()"
+      aria-label="Remove index pattern"
+      confirmation="你确定要删除这个索引吗?"
+      tooltip="删除索引"
+      class="btn btn-danger">
+      <span class="sr-only">删除索引</span>
+      <i aria-hidden="true" class="fa fa-trash"></i>
+    </button>
+  </div>
+</div>
